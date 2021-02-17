@@ -78,30 +78,30 @@ public class TestSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                     c.drawLine(0,height ,width,height ,b);
                     c.drawLine(width,0,width,height ,b);
 
-                    if (x1 >= width - 50) {
+                    if (x1 >= width - 50) { //правая стенка
                         x1 -= dx;
                     }
-                    else if(x2 >= width - 50 ) {
+                    else if(x2 >= width - 50 ) { //правая стенка
                         x2 -= dx;
                     }
-                    else if (y1 >= height - 50) {
+                    else if (y1 >= height - 50) { //нижняя стенка
                         y1 -= dy;
                     }
-                    else if (y2 >= height - 50 ) {
+                    else if (y2 >= height - 50 ) { //нижняя стенка
                         y2 -= dy;
                     }
-                    else if (x1 < 50){
+                    else if (x1 < 50){ //левая стенка
                         x1 += dx;
                     }
-                    else if (x2 < 50){
+                    else if (x2 < 50){ //левая стенка
                         x2 += dy;
-                    }else if (y1 < 50) {
+                    }else if (y1 < 50) { //верхняя стенка
                         y1 += dy;
                     }
-                    else if (y2 < 50) {
+                    else if (y2 < 50) { //верхняя стенка
                         y2 += dy;
                     }
-                    else if (x1 == x2 || y1 == y2) {
+                    else if (x1 == x2 || y1 == y2) { //столкновение шаров
                         x1 -= dx;
                         x2 += dx;
                         y1 += dy;
