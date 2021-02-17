@@ -90,14 +90,16 @@ public class TestSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                     else if (y2 >= height - 50 ) {
                         y2 -= dy;
                     }
-                    else if (x1 < 50 || x2 < 50){
+                    else if (x1 < 50){
                         x1 += dx;
+                    }
+                    else if (x2 < 50){
                         x2 += dy;
-
-                    } else if (y1 < 50 || y2 < 50) {
+                    }else if (y1 < 50) {
                         y1 += dy;
+                    }
+                    else if (y2 < 50) {
                         y2 += dy;
-
                     }
                     else if (x1 == x2 || y1 == y2) {
                         x1 -= dx;
