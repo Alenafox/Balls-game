@@ -33,22 +33,21 @@ public class TestSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     float x = 400, y = 400;
     Rect centerRect = new Rect();
     Paint p3 = new Paint();
+    int speed = 10;
     DrawThread thread;
     Random r = new Random();
     int dx = 20, dy = 10, rad = 40;
     int width, height; // ширина и высота канвы
-    public void changeColor() {
-        color = Color.rgb(r.nextInt(255),r.nextInt(255),r.nextInt(255));
-    }
     class DrawThread extends Thread {
         int color1 = resources.getColor(R.color.ball1,  null);
+        int color2 = resources.getColor(R.color.ball2,  null);
+        int color3 = resources.getColor(R.color.ball3,  null);
         boolean runFlag = true;
         float x1 = 300, y1 = 300;
         float x2 = 100, y2 = 200;
         Paint p1 = new Paint();
         Paint p2 = new Paint();
         Paint b = new Paint();
-        boolean touch = false;
 
         public DrawThread(SurfaceHolder holder){
             this.holder = holder;
@@ -78,54 +77,41 @@ public class TestSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                     c.drawLine(0,height ,width,height ,b);
                     c.drawLine(width,0,width,height ,b);
 
-                    if (x1 >= width - 50) { //правая стенка
-                        x1 -= dx;
+                    if (x1 >= width - 50 || x2 >= width - 50) { //правая стенка
+                        dx = -dx;
                     }
-                    else if(x2 >= width - 50 ) { //правая стенка
-                        x2 -= dx;
+                    if (x2 >= width - 50) { //правая стенка
+                        dx = -dx;
                     }
                     else if (y1 >= height - 50) { //нижняя стенка
-                        y1 -= dy;
+                        dy = -dy;
                     }
-                    else if (y2 >= height - 50 ) { //нижняя стенка
-                        y2 -= dy;
+                    else if (y1 >= height - 50) { //нижняя стенка
+                        dy = -dy;
                     }
-                    else if (x1 < 50){ //левая стенка
-                        x1 += dx;
+                    else if (x1 < 50 || x2 < 50){ //левая стенка
+                        dx = -dx;
                     }
-                    else if (x2 < 50){ //левая стенка
-                        x2 += dy;
-                    }else if (y1 < 50) { //верхняя стенка
-                        y1 += dy;
-                    }
-                    else if (y2 < 50) { //верхняя стенка
-                        y2 += dy;
+                    }else if (y1 < 50 || y2 < 50) { //верхняя стенка
+                        dy = -dy;
                     }
                     else if (x1 == x2 || y1 == y2) { //столкновение шаров
-                        x1 -= dx;
-                        x2 += dx;
-                        y1 += dy;
-                        y2 -= dy;
+                        dx = -dx;
+                        dy = -dy;
                     }
-                    else if ((x1 >= centerRect.left && x1 <= centerRect.right) && (y1 >= centerRect.top && y1 <= centerRect.bottom) ) {
-                        x1 -= dx;
-                        y1 += dy;
+                    if ((x1 >= centerRect.left && x1 <= centerRect.right) || (y1 >= centerRect.top && y1 <= centerRect.bottom) ) {
+                        dx -= dx;
+                        p1.setColor(color2);
+                    }
+                    if ((x2 >= centerRect.left && x2 <= centerRect.right) || (y2 >= centerRect.top && y2 <= centerRect.bottom) ) {
+                        dx -= dx;
+                        p2.setColor(color3);
+                    }
+                    x1+= dx;
+                    y1+= dy;
 
-                        p1.setColor(Color.rgb( 67 , 178 , 21 ));
-                    }
-                    else if ((x2 >= centerRect.left && x2 <= centerRect.right) && (y2 >= centerRect.top && y2 <= centerRect.bottom) ) {
-                        x2 -= dx;
-                        y2 += dy;
-
-                        p2.setColor(Color.rgb( 145 , 134 , 11 ));
-                    }
-                    else {
-                        x1+= dx;
-                        y1+= dy;
-
-                        x2 += dx;
-                        y2 += dy;
-                    }
+                    x2 += dx;
+                    y2 += dy;
                     c.drawCircle(x1,y1,rad,p1);
                     c.drawCircle(x2,y2,rad,p2);
                     c.drawRect(centerRect, p3);
@@ -140,7 +126,6 @@ public class TestSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                 }
             }
         }
-    }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
