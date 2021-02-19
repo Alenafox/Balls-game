@@ -16,6 +16,7 @@ import android.view.SurfaceView;
 import androidx.annotation.RequiresApi;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 @RequiresApi(api = Build.VERSION_CODES.M)
@@ -26,28 +27,32 @@ public class TestSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     boolean drag = false;
     float dragX = 0;
     float dragY = 0;
+
+    int left, top, right, bottom;
+
+    float x1 = 300, y1 = 300;
+    float x2 = 100, y2 = 200;
+
+    ArrayList<Integer> colors = new ArrayList<Integer>(Arrays.asList(
+            R.color.ball1, R.color.ball2, R.color.ball3, R.color.ball4
+    ));
+
     int rectCol1 = resources.getColor(R.color.rect1,  null);
     int rectCol2 = resources.getColor(R.color.rect2,  null);
     int boardCol = resources.getColor(R.color.board,  null);
     int side = 200;
-    float x = 400, y = 400;
+    int x = 400, y = 400;
     Rect centerRect = new Rect();
     Paint p3 = new Paint();
-    int speed = 10;
     DrawThread thread;
     Random r = new Random();
-    int dx = 20, dy = 10, rad = 40;
     int width, height; // ширина и высота канвы
     class DrawThread extends Thread {
-        int color1 = resources.getColor(R.color.ball1,  null);
-        int color2 = resources.getColor(R.color.ball2,  null);
-        int color3 = resources.getColor(R.color.ball3,  null);
         boolean runFlag = true;
-        float x1 = 300, y1 = 300;
-        float x2 = 100, y2 = 200;
         Paint p1 = new Paint();
         Paint p2 = new Paint();
         Paint b = new Paint();
+        Paint win = new Paint();
 
         public DrawThread(SurfaceHolder holder){
             this.holder = holder;
@@ -58,17 +63,34 @@ public class TestSurfaceView extends SurfaceView implements SurfaceHolder.Callba
 
         public void run() {
             super.run();
-            p1.setColor(color1);
-            p2.setColor(Color.MAGENTA);
+            p1.setColor(getResources().getColor(R.color.ball1));
+            p2.setColor(getResources().getColor(R.color.ball2));
             p3.setColor(rectCol1);
             b.setColor(boardCol);
             b.setStrokeWidth(50);
+
+            float dx1 = 20, dy1 = 10;
+            float dx2 = -30, dy2 = 25;
+
+            int distance = 50;
+            float rad = 30;
+
+            left = 400;
+            top = 400;
+            right = 600;
+            bottom = 600;
+
+            x1+= r.nextFloat() * distance - 10;
+            y1+= r.nextFloat() * distance - 10;
+
+            x2 += r.nextFloat() * distance - 10;
+            y2 += r.nextFloat() * distance - 10;
 
             while (runFlag){
                 Canvas c = holder.lockCanvas();
                 if (c != null) {
                     c.drawColor(color);
-                    c.drawRect(x, y, x + side, y + side, p3);
+                    centerRect.set(x, y, x + side, y + side);
                     width = c.getWidth();
                     height = c.getHeight();
 
@@ -77,44 +99,63 @@ public class TestSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                     c.drawLine(0,height ,width,height ,b);
                     c.drawLine(width,0,width,height ,b);
 
-                    if (x1 >= width - 50 || x2 >= width - 50) { //правая стенка
-                        dx = -dx;
+                    if (x1 >= width - 50 - rad) {
+                        dx1 = -dx1;
                     }
-                    if (x2 >= width - 50) { //правая стенка
-                        dx = -dx;
+                    else if(x2 >= width - 50-rad){
+                        dx2 = -dx2;
+                    } else if (y1 >= height - 50 - rad) {
+                        dy1 = -dy1;
+                    } else if(y2 >= height - 50 - rad){
+                        dy2 = -dy2;
+                    } else if (x1 < 50 + rad){
+                        dx1 = -dx1;
+                    } else if(x2 < 50 + rad){
+                        dx2 = -dx2;
+                    }else if (y1 < 50 + rad) {
+                        dy1 = -dy1;
+                    } else if(y2 < 50 + rad){
+                        dy2 = -dy2;
                     }
-                    else if (y1 >= height - 50) { //нижняя стенка
-                        dy = -dy;
+                    else if (y2 == y1) {
+                        dy1 = -dy1;
+                        dy2 = -dy2;
                     }
-                    else if (y1 >= height - 50) { //нижняя стенка
-                        dy = -dy;
+                    else if (x2 == x1) {
+                        dx1 = -dx1;
+                        dx2 = -dx2;
                     }
-                    else if (x1 < 50 || x2 < 50){ //левая стенка
-                        dx = -dx;
+                    else if ((x1 >= centerRect.left-25 && x1 <= centerRect.right-25) && (y1 >= centerRect.top-25 && y1 <= centerRect.bottom-25) ) {
+                        dx1 = -dx1;
+                        dy1 = -dy1;
+                        int random = (int) (r.nextFloat() * colors.size());
+                        int color = colors.get(random);
+                        p1.setColor(getResources().getColor(color));
                     }
-                    }else if (y1 < 50 || y2 < 50) { //верхняя стенка
-                        dy = -dy;
+                    else if ((x2 >= centerRect.left-25 && x2 <= centerRect.right-25) && (y2 >= centerRect.top-25 && y2 <= centerRect.bottom-25)) {
+                        dx2 = -dx2;
+                        dy2 = -dy2;
+                        int random = (int) (r.nextFloat() * colors.size());
+                        int color = colors.get(random);
+                        p2.setColor(getResources().getColor(color));
                     }
-                    else if (x1 == x2 || y1 == y2) { //столкновение шаров
-                        dx = -dx;
-                        dy = -dy;
-                    }
-                    if ((x1 >= centerRect.left && x1 <= centerRect.right) || (y1 >= centerRect.top && y1 <= centerRect.bottom) ) {
-                        dx -= dx;
-                        p1.setColor(color2);
-                    }
-                    if ((x2 >= centerRect.left && x2 <= centerRect.right) || (y2 >= centerRect.top && y2 <= centerRect.bottom) ) {
-                        dx -= dx;
-                        p2.setColor(color3);
-                    }
-                    x1+= dx;
-                    y1+= dy;
+                    x1 += dx1;
+                    y1 += dy1;
 
-                    x2 += dx;
-                    y2 += dy;
+                    x2 += dx2;
+                    y2 += dy2;
+
                     c.drawCircle(x1,y1,rad,p1);
                     c.drawCircle(x2,y2,rad,p2);
                     c.drawRect(centerRect, p3);
+
+                    if (p1.getColor() == p2.getColor()){
+                        win.setColor(getResources().getColor(R.color.colorPrimaryDark));
+                        win.setTextSize(200);
+                        c.drawText("You win!", 200, 800, win);
+                        runFlag=false;
+                    }
+                }
 
                     holder.unlockCanvasAndPost(c);
 
@@ -151,8 +192,8 @@ public class TestSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                 // если режим перетаскивания включен
                 if (drag) {
                     // определеяем новые координаты для рисования
-                    x = evX - dragX;
-                    y = evY - dragY;
+                    x = (int) (evX - dragX);
+                    y = (int) (evY - dragY);
                     // перерисовываю экран
                     invalidate();
                 }
