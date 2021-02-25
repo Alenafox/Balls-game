@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -21,6 +22,7 @@ import java.util.Random;
 
 @RequiresApi(api = Build.VERSION_CODES.M)
 public class TestSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
+    MediaPlayer mediaPlayer;
     SurfaceHolder holder;
     Resources resources = getResources();
     int color = Color.WHITE;
@@ -101,31 +103,42 @@ public class TestSurfaceView extends SurfaceView implements SurfaceHolder.Callba
 
                     if (x1 >= width - 50 - rad) {
                         dx1 = -dx1;
+                        makeSound();
                     }
                     else if(x2 >= width - 50-rad){
+                        makeSound();
                         dx2 = -dx2;
                     } else if (y1 >= height - 50 - rad) {
+                        makeSound();
                         dy1 = -dy1;
                     } else if(y2 >= height - 50 - rad){
+                        makeSound();
                         dy2 = -dy2;
                     } else if (x1 < 50 + rad){
+                        makeSound();
                         dx1 = -dx1;
                     } else if(x2 < 50 + rad){
+                        makeSound();
                         dx2 = -dx2;
                     }else if (y1 < 50 + rad) {
+                        makeSound();
                         dy1 = -dy1;
                     } else if(y2 < 50 + rad){
+                        makeSound();
                         dy2 = -dy2;
                     }
                     else if (y2 == y1) {
+                        makeSound();
                         dy1 = -dy1;
                         dy2 = -dy2;
                     }
                     else if (x2 == x1) {
+                        makeSound();
                         dx1 = -dx1;
                         dx2 = -dx2;
                     }
                     else if ((x1 >= centerRect.left-25 && x1 <= centerRect.right-25) && (y1 >= centerRect.top-25 && y1 <= centerRect.bottom-25) ) {
+                        makeSound();
                         dx1 = -dx1;
                         dy1 = -dy1;
                         int random = (int) (r.nextFloat() * colors.size());
@@ -133,6 +146,7 @@ public class TestSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                         p1.setColor(getResources().getColor(color));
                     }
                     else if ((x2 >= centerRect.left-25 && x2 <= centerRect.right-25) && (y2 >= centerRect.top-25 && y2 <= centerRect.bottom-25)) {
+                        makeSound();
                         dx2 = -dx2;
                         dy2 = -dy2;
                         int random = (int) (r.nextFloat() * colors.size());
@@ -157,16 +171,16 @@ public class TestSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                     }
                 }
 
-                    holder.unlockCanvasAndPost(c);
+                holder.unlockCanvasAndPost(c);
 
-                    try {
-                        Thread.sleep(100);
-                    }
-                    catch (InterruptedException e){
-                    }
+                try {
+                    Thread.sleep(100);
+                }
+                catch (InterruptedException e){
                 }
             }
         }
+    }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -210,8 +224,9 @@ public class TestSurfaceView extends SurfaceView implements SurfaceHolder.Callba
 
     public TestSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mediaPlayer = MediaPlayer.create(context, R.raw.sound1);
         getHolder().addCallback(this);
-
+        thread = new DrawThread(getHolder());
     }
 
     @Override
@@ -232,5 +247,10 @@ public class TestSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
         thread.runFlag = false;
+    }
+
+    public void makeSound() {
+        mediaPlayer = MediaPlayer.create(getContext(), R.raw.sound1);
+        mediaPlayer.start();
     }
 }
